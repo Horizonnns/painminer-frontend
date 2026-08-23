@@ -6,12 +6,15 @@ import { useState } from "react";
 import {
   useAuthStatus,
   useCancelLogin,
+  useSaveCredentials,
   useSendCode,
   useSendPassword,
   useSendPhone,
 } from "@/entities/auth/api/queries";
 import {
   cleanCode,
+  isApiHashReady,
+  isApiIdReady,
   isCodeReady,
   isPasswordReady,
   isPhoneReady,
@@ -31,6 +34,68 @@ function StepError({ error }: { error: unknown }) {
   const text =
     error instanceof ApiError ? error.humanMessage : MESSAGES.errors.unknown;
   return <p className="text-xs text-bad">{text}</p>;
+}
+
+function CredentialsStep() {
+  const [apiId, setApiId] = useState("");
+  const [apiHash, setApiHash] = useState("");
+  const save = useSaveCredentials();
+  const ready = isApiIdReady(apiId) && isApiHashReady(apiHash);
+
+  return (
+    <Card>
+      <CardHeader
+        title={MESSAGES.login.noCredentialsTitle}
+        hint={MESSAGES.login.noCredentialsHint}
+      />
+      <ol className="space-y-1.5 border-b border-divider p-4 text-xs text-muted">
+        {MESSAGES.login.credentialsSteps.map((step, index) => (
+          <li key={step} className="flex gap-2">
+            <span className="font-mono text-faint">{index + 1}</span>
+            <span>{step}</span>
+          </li>
+        ))}
+      </ol>
+      <form
+        className="space-y-3 p-4"
+        onSubmit={(event) => {
+          event.preventDefault();
+          save.mutate({ api_id: apiId.trim(), api_hash: apiHash.trim() });
+        }}
+      >
+        <Field label={MESSAGES.login.apiId}>
+          <Input
+            autoFocus
+            inputMode="numeric"
+            value={apiId}
+            placeholder={MESSAGES.login.apiIdPlaceholder}
+            onChange={(event) => setApiId(event.target.value)}
+          />
+        </Field>
+        <Field label={MESSAGES.login.apiHash} hint={MESSAGES.login.credentialsWhere}>
+          <Input
+            value={apiHash}
+            placeholder={MESSAGES.login.apiHashPlaceholder}
+            onChange={(event) => setApiHash(event.target.value)}
+          />
+        </Field>
+        <div className="flex flex-wrap items-center gap-3">
+          <Button type="submit" variant="primary" disabled={!ready || save.isPending}>
+            {MESSAGES.login.saveCredentials}
+          </Button>
+          <a
+            href="https://my.telegram.org/apps"
+            target="_blank"
+            rel="noreferrer noopener"
+            className="text-xs text-muted underline-offset-2 transition-colors hover:text-accent hover:underline"
+          >
+            {MESSAGES.login.openTelegramApps}
+          </a>
+        </div>
+        <StepError error={save.error} />
+      </form>
+    </Card>
+  );
 }
 
 function Authorized({ user }: { user: string | null }) {
@@ -195,11 +260,7 @@ export function LoginView() {
       </div>
 
       {!data.has_credentials ? (
-        <StateBlock
-          tone="bad"
-          title={MESSAGES.login.noCredentialsTitle}
-          hint={MESSAGES.login.noCredentialsHint}
-        />
+        <CredentialsStep />
       ) : data.authorized ? (
         <Authorized user={data.user} />
       ) : data.stage === "unknown" || !data.checked ? (

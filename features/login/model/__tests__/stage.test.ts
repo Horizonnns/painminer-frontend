@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 
 import {
   cleanCode,
+  isApiHashReady,
+  isApiIdReady,
   isCodeReady,
   isPasswordReady,
   isPhoneReady,
@@ -49,5 +51,19 @@ describe("isPasswordReady", () => {
   it("любой непустой пароль годится — проверяет Telegram", () => {
     expect(isPasswordReady("")).toBe(false);
     expect(isPasswordReady(" ")).toBe(true);
+  });
+});
+
+describe("ключи приложения", () => {
+  it("api_id — только цифры", () => {
+    expect(isApiIdReady(" 1234567 ")).toBe(true);
+    expect(isApiIdReady("12ab")).toBe(false);
+    expect(isApiIdReady("")).toBe(false);
+  });
+
+  it("api_hash — ровно 32 шестнадцатеричных символа", () => {
+    expect(isApiHashReady("0123456789abcdef0123456789ABCDEF")).toBe(true);
+    expect(isApiHashReady("0123456789abcdef")).toBe(false);
+    expect(isApiHashReady("z".repeat(32))).toBe(false);
   });
 });

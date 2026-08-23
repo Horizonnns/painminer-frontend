@@ -30,6 +30,10 @@ function useAuthStep<TBody>(path: string) {
   });
 }
 
+export function useSaveCredentials() {
+  return useAuthStep<{ api_id: string; api_hash: string }>("/auth/credentials");
+}
+
 export function useSendPhone() {
   return useAuthStep<{ phone: string }>("/auth/phone");
 }

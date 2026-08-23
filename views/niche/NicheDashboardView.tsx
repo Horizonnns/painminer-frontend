@@ -3,7 +3,9 @@
 import Link from "next/link";
 
 import { useNicheSummary } from "@/entities/niche/api/queries";
+import { useAuthStatus } from "@/entities/auth/api/queries";
 import { ChatsTable } from "@/widgets/chats-table/ChatsTable";
+import { NextStep } from "@/widgets/next-step/NextStep";
 import { FindingsCard } from "@/widgets/findings-card/FindingsCard";
 import { ApiError } from "@/shared/api/client";
 import { ROUTES } from "@/shared/config/constants";
@@ -37,6 +39,7 @@ function Counters({ counts }: { counts: Record<string, number> }) {
 
 export function NicheDashboardView({ niche }: { niche: string }) {
   const { data, isPending, error, refetch } = useNicheSummary(niche);
+  const auth = useAuthStatus();
 
   if (isPending) return <SkeletonList rows={3} />;
 
@@ -51,6 +54,13 @@ export function NicheDashboardView({ niche }: { niche: string }) {
 
   return (
     <div className="space-y-6">
+      <NextStep
+        niche={niche}
+        authorized={Boolean(auth.data?.authorized)}
+        chats={data.chats.length}
+        findings={data.counts.messages ?? 0}
+      />
+
       <Counters counts={data.counts} />
 
       <FindingsCard

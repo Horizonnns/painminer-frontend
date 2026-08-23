@@ -24,3 +24,12 @@ export function cleanCode(raw: string): string {
 export function isPasswordReady(raw: string): boolean {
   return (raw ?? "").length > 0;
 }
+
+/** Ключи приложения. Проверки те же, что в painminer/tg_client.py. */
+export function isApiIdReady(raw: string): boolean {
+  return /^\d+$/.test((raw ?? "").trim());
+}
+
+export function isApiHashReady(raw: string): boolean {
+  return /^[0-9a-f]{32}$/i.test((raw ?? "").trim());
+}

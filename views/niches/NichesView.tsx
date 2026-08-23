@@ -1,11 +1,13 @@
 "use client";
 
 import { Plus } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { useCreateNiche, useNiches } from "@/entities/niche/api/queries";
 import { NicheCard } from "@/entities/niche/ui/NicheCard";
 import { ApiError } from "@/shared/api/client";
+import { ROUTES } from "@/shared/config/constants";
 import { MESSAGES } from "@/shared/config/messages";
 import { Button } from "@/shared/ui/Button";
 import { Field, Input } from "@/shared/ui/Input";
@@ -15,13 +17,20 @@ import { ErrorState, StateBlock } from "@/shared/ui/StateBlock";
 function CreateNicheForm({ onDone }: { onDone: () => void }) {
   const [name, setName] = useState("");
   const create = useCreateNiche();
+  const router = useRouter();
 
   return (
     <form
       className="rounded-lg border border-border bg-surface p-4"
       onSubmit={(event) => {
         event.preventDefault();
-        create.mutate(name.trim(), { onSuccess: onDone });
+        // Сразу ведём на следующий шаг — пустая ниша сама по себе бесполезна.
+        create.mutate(name.trim(), {
+          onSuccess: (config) => {
+            onDone();
+            router.push(ROUTES.chats(config.niche));
+          },
+        });
       }}
     >
       <Field label={MESSAGES.niches.createTitle} hint={MESSAGES.niches.nameHint}>
@@ -61,6 +70,7 @@ export function NichesView() {
         <div>
           <h1 className="text-2xl font-semibold text-text">{MESSAGES.niches.title}</h1>
           <p className="mt-1 text-sm text-muted">{MESSAGES.niches.subtitle}</p>
+          <p className="mt-2 max-w-2xl text-xs text-faint">{MESSAGES.niches.explain}</p>
         </div>
         {!creating ? (
           <Button size="sm" icon={<Plus size={14} />} onClick={() => setCreating(true)}>
