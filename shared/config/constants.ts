@@ -5,6 +5,7 @@ export const API_BASE_URL =
 
 export const ROUTES = {
   niches: "/",
+  login: "/login",
   niche: (niche: string) => `/n/${niche}`,
   findings: (niche: string) => `/n/${niche}/findings`,
   report: (niche: string) => `/n/${niche}/report`,

@@ -1,6 +1,7 @@
 "use client";
 
 import { Play, Square } from "lucide-react";
+import Link from "next/link";
 import { useCallback, useState } from "react";
 
 import { useNicheConfig } from "@/entities/niche/api/queries";
@@ -13,6 +14,7 @@ import {
 import { useRunStream } from "@/features/run-scan/model/use-run-stream";
 import { ScanConsole } from "@/widgets/scan-console/ScanConsole";
 import { ApiError } from "@/shared/api/client";
+import { ROUTES } from "@/shared/config/constants";
 import { MESSAGES } from "@/shared/config/messages";
 import { Button } from "@/shared/ui/Button";
 import { Card, CardHeader } from "@/shared/ui/Card";
@@ -47,10 +49,20 @@ function Checkbox({
   );
 }
 
-function startError(error: unknown): { title: string; hint: string } | null {
+interface StartProblem {
+  title: string;
+  hint: string;
+  code?: string;
+}
+
+function startError(error: unknown): StartProblem | null {
   if (!(error instanceof ApiError)) return null;
   if (error.code === "no_session") {
-    return { title: MESSAGES.scan.needLogin, hint: MESSAGES.scan.needLoginHint };
+    return {
+      title: MESSAGES.scan.needLogin,
+      hint: MESSAGES.scan.needLoginHint,
+      code: error.code,
+    };
   }
   if (error.code === "run_in_progress") {
     return { title: MESSAGES.scan.busy, hint: MESSAGES.scan.busyHint };
@@ -134,7 +146,20 @@ export function ScanView({ niche }: { niche: string }) {
 
       <div className="space-y-4">
         {problem ? (
-          <StateBlock tone="bad" title={problem.title} hint={problem.hint} />
+          <StateBlock
+            tone="bad"
+            title={problem.title}
+            hint={problem.hint}
+            action={
+              problem.code === "no_session" ? (
+                <Link href={ROUTES.login}>
+                  <Button size="sm" variant="primary">
+                    {MESSAGES.login.action}
+                  </Button>
+                </Link>
+              ) : null
+            }
+          />
         ) : null}
 
         {streamError && !finished ? (

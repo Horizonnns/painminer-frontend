@@ -1,6 +1,7 @@
 "use client";
 
 import { Search } from "lucide-react";
+import Link from "next/link";
 import { useMemo, useState } from "react";
 
 import { useAddChats, useDiscover } from "@/entities/chat/api/queries";
@@ -12,6 +13,7 @@ import {
   withoutExisting,
 } from "@/features/discover-chats/model/selection";
 import { ApiError } from "@/shared/api/client";
+import { ROUTES } from "@/shared/config/constants";
 import { MESSAGES } from "@/shared/config/messages";
 import { Badge } from "@/shared/ui/Badge";
 import { Button } from "@/shared/ui/Button";
@@ -121,6 +123,15 @@ export function DiscoverPanel({
         <div className="p-4">
           <StateBlock
             tone="bad"
+            action={
+              discover.error instanceof ApiError && discover.error.code === "no_session" ? (
+                <Link href={ROUTES.login}>
+                  <Button size="sm" variant="primary">
+                    {MESSAGES.login.action}
+                  </Button>
+                </Link>
+              ) : null
+            }
             title={
               discover.error instanceof ApiError && discover.error.code === "no_session"
                 ? MESSAGES.discover.needLogin

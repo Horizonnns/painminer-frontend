@@ -1,6 +1,7 @@
 /** Зеркало painminer/api/schemas.py. Инлайновых типов в компонентах нет. */
 
 export type Verdict = "yes" | "no" | "maybe";
+export type AuthStage = "phone" | "code" | "password" | "done" | "unknown";
 export type RunStatus = "running" | "done" | "failed" | "stopped";
 export type ChatStatus =
   | "new"
@@ -191,4 +192,14 @@ export interface RunState {
   current: string | null;
   stats: ScanStats | null;
   errors: string[];
+}
+
+export interface AuthStatus {
+  stage: AuthStage;
+  authorized: boolean;
+  /** false — состояние проверить не удалось (например, сессию занял прогон). */
+  checked: boolean;
+  has_credentials: boolean;
+  user: string | null;
+  phone: string | null;
 }
