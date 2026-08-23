@@ -1,36 +1,66 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# painminer — интерфейс
 
-## Getting Started
+Веб-интерфейс к [painminer](../back): смотреть находки, размечать их в
+кластеры болей, запускать прогоны и читать аналитику.
 
-First, run the development server:
+Данные берутся только из HTTP-слоя бэкенда — своей базы у фронта нет.
+
+## Запуск
+
+Сначала бэкенд (в соседнем каталоге `back`):
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pip install -e ".[api]"
+painminer login    # один раз: телефон и код, создаётся session-файл
+painminer serve    # http://127.0.0.1:8765/api
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Потом фронт:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm install
+npm run dev        # http://localhost:3000
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Адрес API меняется переменной `NEXT_PUBLIC_API_URL`; по умолчанию
+`http://127.0.0.1:8765/api`. Бэкенд разрешает CORS только для
+`localhost:3000` и `127.0.0.1:3000`.
 
-## Learn More
+## Экраны
 
-To learn more about Next.js, take a look at the following resources:
+| Путь | Что делает |
+|---|---|
+| `/` | список ниш, создание новой |
+| `/n/<ниша>` | сводка: счётчики, топ находок, деньги, кластеры, чаты |
+| `/n/<ниша>/findings` | находки с фильтрами и панелью разметки |
+| `/n/<ниша>/report` | биграммы и триграммы, деньги, разбивка по чатам |
+| `/n/<ниша>/chats` | чаты со статусами и поиск новых |
+| `/n/<ниша>/scan` | прогон с живым прогрессом |
+| `/n/<ниша>/settings` | запросы, шум, параметры прогона |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Фильтры находок живут в URL: перезагрузка и «назад» их не теряют.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Вход в Telegram
 
-## Deploy on Vercel
+Логин делается только в терминале командой `painminer login`. Интерфейс коды
+подтверждения не принимает и не передаёт. Пока session-файла нет, поиск чатов
+и прогон отвечают понятной ошибкой со ссылкой на эту команду.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Приватность
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+В интерфейсе нет автора сообщения — ни имени, ни username, ни id. Цель
+инструмента — повторяющиеся формулировки проблем, а не профили участников
+чатов. Единственный путь к первоисточнику — ссылка на сообщение в Telegram.
+
+## Разработка
+
+```bash
+npm test           # vitest, чистая логика
+npm run typecheck  # tsc --noEmit
+npm run lint
+npm run build
+```
+
+Правила кода — в [CLAUDE.md](CLAUDE.md), визуал — в
+[DESIGN_SYSTEM.md](DESIGN_SYSTEM.md), контракт с бэкендом —
+в [docs/superpowers/specs](docs/superpowers/specs).

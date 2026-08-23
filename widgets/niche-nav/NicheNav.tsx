@@ -15,6 +15,7 @@ function tabs(niche: string) {
     { href: ROUTES.report(niche), label: MESSAGES.nav.report },
     { href: ROUTES.chats(niche), label: MESSAGES.nav.chats },
     { href: ROUTES.scan(niche), label: MESSAGES.nav.scan },
+    { href: ROUTES.settings(niche), label: MESSAGES.nav.settings },
   ];
 }
 

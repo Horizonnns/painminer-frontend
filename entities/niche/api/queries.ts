@@ -6,6 +6,7 @@ import { apiGet, apiSend } from "@/shared/api/client";
 import type {
   NicheBrief,
   NicheConfig,
+  NicheConfigPatch,
   NicheSummary,
   Report,
 } from "@/shared/api/types";
@@ -44,6 +45,18 @@ export function useNicheReport(niche: string, top = 30) {
   return useQuery({
     queryKey: nicheKeys.report(niche, top),
     queryFn: () => apiGet<Report>(`/niches/${niche}/report`, { top }),
+  });
+}
+
+export function useUpdateNicheConfig(niche: string) {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (patch: NicheConfigPatch) =>
+      apiSend<NicheConfig>("PUT", `/niches/${niche}/config`, patch),
+    onSuccess: (config) => {
+      client.setQueryData(nicheKeys.config(niche), config);
+      void client.invalidateQueries({ queryKey: nicheKeys.all });
+    },
   });
 }
 
