@@ -28,8 +28,10 @@ export function FindingsList({
   loadingMore,
 }: FindingsListProps) {
   return (
-    <div className="rounded-lg border border-border bg-surface">
-      <div className="flex items-center justify-between border-b border-divider px-4 py-2.5 text-xs text-faint">
+    // Высота ограничена высотой окна: скролл живёт внутри списка, а шапка со
+    // счётчиком и кнопка «показать ещё» остаются на виду.
+    <div className="flex max-h-[calc(100vh-14rem)] flex-col rounded-lg border border-border bg-surface">
+      <div className="flex shrink-0 items-center justify-between border-b border-divider px-4 py-2.5 text-xs text-faint">
         <span>
           {MESSAGES.findings.shown}{" "}
           <span className="font-mono text-muted tabular-nums">
@@ -40,7 +42,7 @@ export function FindingsList({
         </span>
       </div>
 
-      <ul>
+      <ul className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
         {findings.map((finding) => (
           <li key={finding.message_id}>
             <FindingRow
@@ -54,7 +56,7 @@ export function FindingsList({
       </ul>
 
       {hasMore ? (
-        <div className="border-t border-divider p-3">
+        <div className="shrink-0 border-t border-divider p-3">
           <Button size="sm" className="w-full" onClick={onLoadMore} disabled={loadingMore}>
             {MESSAGES.findings.loadMore}
           </Button>

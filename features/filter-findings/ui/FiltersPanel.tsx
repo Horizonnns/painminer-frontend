@@ -30,7 +30,9 @@ export function FiltersPanel({ filters, facets, onUpdate, onReset }: FiltersPane
   const active = countActive(filters);
 
   return (
-    <aside className="space-y-4">
+    // Длинный список фасетов не должен тянуть всю страницу: колонка
+    // прилипает и скроллится сама, как и список находок рядом.
+    <aside className="space-y-4 lg:sticky lg:top-16 lg:max-h-[calc(100vh-14rem)] lg:overflow-y-auto lg:overscroll-contain lg:pr-1">
       <div className="flex items-center justify-between">
         <h2 className="text-sm font-medium text-text">{MESSAGES.filters.title}</h2>
         {active > 0 ? (
