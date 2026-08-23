@@ -95,9 +95,12 @@ export function NotePanel({ finding, clusters, saving, onSave }: NotePanelProps)
 
       </div>
 
-      <div className="shrink-0 space-y-3 border-t border-divider p-4">
+      <div className="shrink-0 space-y-2.5 border-t border-divider px-4 py-3">
         <div>
-          <span className="mb-1.5 block text-xs text-muted">{MESSAGES.filters.verdict}</span>
+          <div className="mb-1.5 flex items-baseline justify-between gap-2">
+            <span className="text-xs text-muted">{MESSAGES.filters.verdict}</span>
+            <span className="font-mono text-xs text-faint">{MESSAGES.note.verdictHint}</span>
+          </div>
           <div className="flex gap-1">
             {VERDICTS.map((option) => (
               <button
@@ -116,10 +119,9 @@ export function NotePanel({ finding, clusters, saving, onSave }: NotePanelProps)
               </button>
             ))}
           </div>
-          <p className="mt-1.5 text-xs text-faint">{MESSAGES.note.verdictHint}</p>
         </div>
 
-        <Field label={MESSAGES.note.cluster} hint={MESSAGES.note.clusterHint}>
+        <Field label={MESSAGES.note.cluster}>
           <Input
             value={cluster}
             list={CLUSTERS_LIST_ID}
@@ -133,21 +135,18 @@ export function NotePanel({ finding, clusters, saving, onSave }: NotePanelProps)
           ))}
         </datalist>
 
-        <Field label={MESSAGES.note.comment}>
-          <Textarea
-            rows={3}
-            value={comment}
-            placeholder={MESSAGES.note.commentPlaceholder}
-            onChange={(event) => setComment(event.target.value)}
-          />
-        </Field>
+        {/* Подпись не нужна: плейсхолдер говорит то же самое, а место дорогое. */}
+        <Textarea
+          rows={2}
+          value={comment}
+          aria-label={MESSAGES.note.comment}
+          placeholder={MESSAGES.note.commentPlaceholder}
+          onChange={(event) => setComment(event.target.value)}
+        />
 
-        <div className="flex items-center gap-2">
-          <Button variant="primary" size="sm" onClick={submit} disabled={saving}>
-            {MESSAGES.note.save}
-          </Button>
-          <span className="text-xs text-faint">{MESSAGES.note.history}</span>
-        </div>
+        <Button variant="primary" size="sm" onClick={submit} disabled={saving}>
+          {MESSAGES.note.save}
+        </Button>
       </div>
     </div>
   );

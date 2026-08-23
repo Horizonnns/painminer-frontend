@@ -115,7 +115,7 @@ export const MESSAGES = {
     commentPlaceholder: "Чем это может быть полезно",
     save: "Сохранить",
     saved: "Сохранено",
-    verdictHint: "y / n / m — с клавиатуры",
+    verdictHint: "y n m",
     metrics: "Метрики",
     queriesMatched: "Сработавшие запросы",
     history: "Заметки накапливаются: в отчёт идёт последняя",
