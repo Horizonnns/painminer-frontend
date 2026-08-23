@@ -1,16 +1,18 @@
 "use client";
 
+import Link from "next/link";
+
 import { useNicheSummary } from "@/entities/niche/api/queries";
-import { ChatStatusBadge } from "@/entities/chat/ui/ChatStatusBadge";
-import { FindingRow } from "@/entities/finding/ui/FindingRow";
+import { ChatsTable } from "@/widgets/chats-table/ChatsTable";
+import { FindingsCard } from "@/widgets/findings-card/FindingsCard";
 import { ApiError } from "@/shared/api/client";
+import { ROUTES } from "@/shared/config/constants";
 import { MESSAGES } from "@/shared/config/messages";
 import { Badge } from "@/shared/ui/Badge";
 import { Card, CardHeader } from "@/shared/ui/Card";
 import { SkeletonList } from "@/shared/ui/Skeleton";
-import { ErrorState, StateBlock } from "@/shared/ui/StateBlock";
-import { formatNumber, formatRelative } from "@/shared/lib/format";
-import type { Finding } from "@/shared/api/types";
+import { ErrorState } from "@/shared/ui/StateBlock";
+import { formatNumber } from "@/shared/lib/format";
 
 function Counters({ counts }: { counts: Record<string, number> }) {
   const items = [
@@ -18,6 +20,7 @@ function Counters({ counts }: { counts: Record<string, number> }) {
     { label: MESSAGES.niches.hits, value: counts.hits ?? 0 },
     { label: MESSAGES.niches.chats, value: counts.chats ?? 0 },
   ];
+
   return (
     <div className="grid grid-cols-3 gap-3">
       {items.map((item) => (
@@ -29,34 +32,6 @@ function Counters({ counts }: { counts: Record<string, number> }) {
         </Card>
       ))}
     </div>
-  );
-}
-
-function FindingsCard({
-  title,
-  findings,
-  emptyTitle,
-  emptyHint,
-}: {
-  title: string;
-  findings: Finding[];
-  emptyTitle: string;
-  emptyHint?: string;
-}) {
-  const max = findings.reduce((peak, item) => Math.max(peak, item.score), 0);
-  return (
-    <Card>
-      <CardHeader title={title} />
-      {findings.length === 0 ? (
-        <div className="p-4">
-          <StateBlock title={emptyTitle} hint={emptyHint} />
-        </div>
-      ) : (
-        findings.map((finding) => (
-          <FindingRow key={finding.message_id} finding={finding} max={max} />
-        ))
-      )}
-    </Card>
   );
 }
 
@@ -83,63 +58,45 @@ export function NicheDashboardView({ niche }: { niche: string }) {
         findings={data.top}
         emptyTitle={MESSAGES.dashboard.noFindings}
         emptyHint={MESSAGES.dashboard.noFindingsHint}
+        action={
+          <Link
+            href={ROUTES.findings(niche)}
+            className="text-xs text-muted transition-colors hover:text-accent"
+          >
+            {MESSAGES.dashboard.openFindings}
+          </Link>
+        }
       />
 
       {data.money.length > 0 ? (
         <FindingsCard
           title={MESSAGES.dashboard.money}
           findings={data.money}
-          emptyTitle={MESSAGES.dashboard.noFindings}
+          emptyTitle={MESSAGES.report.noMoney}
         />
       ) : null}
 
-      <div className="grid gap-3 lg:grid-cols-2">
-        <Card>
-          <CardHeader title={MESSAGES.dashboard.clusters} />
-          <div className="flex flex-wrap gap-2 p-4">
-            {data.clusters.length === 0 ? (
-              <p className="text-xs text-faint">{MESSAGES.dashboard.noClusters}</p>
-            ) : (
-              data.clusters.map((cluster) => (
-                <Badge key={cluster.value} tone="accent">
+      <Card>
+        <CardHeader title={MESSAGES.dashboard.clusters} />
+        <div className="flex flex-wrap gap-2 p-4">
+          {data.clusters.length === 0 ? (
+            <p className="text-xs text-faint">{MESSAGES.dashboard.noClusters}</p>
+          ) : (
+            data.clusters.map((cluster) => (
+              <Link
+                key={cluster.value}
+                href={`${ROUTES.findings(niche)}?cluster=${encodeURIComponent(cluster.value)}`}
+              >
+                <Badge tone="accent">
                   {cluster.label} · {cluster.count}
                 </Badge>
-              ))
-            )}
-          </div>
-        </Card>
-
-        <Card>
-          <CardHeader
-            title={MESSAGES.dashboard.chats}
-            hint={
-              data.last_scanned_at
-                ? `${MESSAGES.niches.lastScan}: ${formatRelative(data.last_scanned_at)}`
-                : MESSAGES.niches.neverScanned
-            }
-          />
-          {data.chats.length === 0 ? (
-            <p className="p-4 text-xs text-faint">{MESSAGES.niches.emptyHint}</p>
-          ) : (
-            <ul>
-              {data.chats.map((chat) => (
-                <li
-                  key={chat.id}
-                  className="flex items-center gap-3 border-b border-divider px-4 py-2.5 last:border-b-0"
-                >
-                  <span className="min-w-0 flex-1 truncate text-sm text-text">
-                    {chat.title}
-                  </span>
-                  <span className="font-mono text-xs text-faint tabular-nums">
-                    {formatNumber(chat.findings)}
-                  </span>
-                  <ChatStatusBadge status={chat.status} />
-                </li>
-              ))}
-            </ul>
+              </Link>
+            ))
           )}
-        </Card>
-      </div>
+        </div>
+      </Card>
+
+      <ChatsTable chats={data.chats} />
     </div>
   );
 }

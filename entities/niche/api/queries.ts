@@ -3,13 +3,20 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { apiGet, apiSend } from "@/shared/api/client";
-import type { NicheBrief, NicheConfig, NicheSummary } from "@/shared/api/types";
+import type {
+  NicheBrief,
+  NicheConfig,
+  NicheSummary,
+  Report,
+} from "@/shared/api/types";
 
 export const nicheKeys = {
   all: ["niches"] as const,
   list: () => [...nicheKeys.all, "list"] as const,
   summary: (niche: string) => [...nicheKeys.all, niche, "summary"] as const,
   config: (niche: string) => [...nicheKeys.all, niche, "config"] as const,
+  report: (niche: string, top: number) =>
+    [...nicheKeys.all, niche, "report", top] as const,
 };
 
 export function useNiches() {
@@ -30,6 +37,13 @@ export function useNicheConfig(niche: string) {
   return useQuery({
     queryKey: nicheKeys.config(niche),
     queryFn: () => apiGet<NicheConfig>(`/niches/${niche}/config`),
+  });
+}
+
+export function useNicheReport(niche: string, top = 30) {
+  return useQuery({
+    queryKey: nicheKeys.report(niche, top),
+    queryFn: () => apiGet<Report>(`/niches/${niche}/report`, { top }),
   });
 }
 

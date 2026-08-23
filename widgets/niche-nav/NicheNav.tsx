@@ -12,6 +12,7 @@ function tabs(niche: string) {
   return [
     { href: ROUTES.niche(niche), label: MESSAGES.nav.dashboard },
     { href: ROUTES.findings(niche), label: MESSAGES.nav.findings },
+    { href: ROUTES.report(niche), label: MESSAGES.nav.report },
   ];
 }
 
