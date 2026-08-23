@@ -38,8 +38,11 @@ export function NotePanel({ finding, clusters, saving, onSave }: NotePanelProps)
     });
 
   return (
-    <div className="space-y-4">
-      <div>
+    // Сообщение бывает на несколько экранов, поэтому скроллится только оно:
+    // форма разметки нужна под рукой всегда.
+    <div className="flex min-h-0 flex-1 flex-col">
+      <div className="min-h-0 flex-1 space-y-4 overflow-y-auto overscroll-contain p-4">
+        <div>
         <p className="text-sm leading-relaxed text-text">{finding.text}</p>
         <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-faint">
           <span className="text-muted">{finding.chat_title}</span>
@@ -90,7 +93,9 @@ export function NotePanel({ finding, clusters, saving, onSave }: NotePanelProps)
         </div>
       ) : null}
 
-      <div className="space-y-3">
+      </div>
+
+      <div className="shrink-0 space-y-3 border-t border-divider p-4">
         <div>
           <span className="mb-1.5 block text-xs text-muted">{MESSAGES.filters.verdict}</span>
           <div className="flex gap-1">

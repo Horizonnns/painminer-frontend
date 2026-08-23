@@ -92,23 +92,21 @@ export function FindingsView({ niche }: { niche: string }) {
         ) : null}
       </div>
 
-      <Card className="h-fit lg:sticky lg:top-16">
+      <Card className="flex max-h-[calc(100vh-14rem)] flex-col lg:sticky lg:top-16">
         <CardHeader title={MESSAGES.note.title} />
-        <div className="p-4">
-          {selected ? (
-            <NotePanel
-              key={selected.message_id}
-              finding={selected}
-              clusters={facets.clusters}
-              saving={annotate.isPending}
-              onSave={(payload) =>
-                annotate.mutate({ messageId: selected.message_id, payload })
-              }
-            />
-          ) : (
-            <p className="text-xs text-faint">{MESSAGES.findings.selectHint}</p>
-          )}
-        </div>
+        {selected ? (
+          <NotePanel
+            key={selected.message_id}
+            finding={selected}
+            clusters={facets.clusters}
+            saving={annotate.isPending}
+            onSave={(payload) =>
+              annotate.mutate({ messageId: selected.message_id, payload })
+            }
+          />
+        ) : (
+          <p className="p-4 text-xs text-faint">{MESSAGES.findings.selectHint}</p>
+        )}
       </Card>
     </div>
   );
