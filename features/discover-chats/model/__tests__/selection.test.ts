@@ -1,11 +1,13 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  countAddable,
   defaultSelection,
+  existingSet,
+  isAdded,
   isAddable,
   selectedRefs,
   toggle,
-  withoutExisting,
 } from "@/features/discover-chats/model/selection";
 import type { Candidate } from "@/shared/api/types";
 
@@ -25,7 +27,8 @@ const channel: Candidate = {
   kind: "channel",
 };
 
-const CANDIDATES = [group(1, "alpha"), group(2, null), channel];
+const CANDIDATES = [group(1, "alpha"), group(2, null), group(3, "beta"), channel];
+const NONE = existingSet([]);
 
 describe("isAddable", () => {
   it("группа с username подходит", () => {
@@ -41,9 +44,18 @@ describe("isAddable", () => {
   });
 });
 
+describe("isAdded", () => {
+  it("сравнивает username без учёта регистра", () => {
+    expect(isAdded(group(1, "Alpha"), existingSet(["alpha"]))).toBe(true);
+    expect(isAdded(group(1, "alpha"), existingSet(["beta"]))).toBe(false);
+    expect(isAdded(group(2, null), existingSet(["alpha"]))).toBe(false);
+  });
+});
+
 describe("defaultSelection", () => {
-  it("отмечает только пригодные группы", () => {
-    expect([...defaultSelection(CANDIDATES)]).toEqual([1]);
+  it("отмечает пригодные и ещё не добавленные", () => {
+    expect([...defaultSelection(CANDIDATES, NONE)]).toEqual([1, 3]);
+    expect([...defaultSelection(CANDIDATES, existingSet(["ALPHA"]))]).toEqual([3]);
   });
 });
 
@@ -63,17 +75,24 @@ describe("toggle", () => {
 
 describe("selectedRefs", () => {
   it("отдаёт username отмеченных пригодных", () => {
-    expect(selectedRefs(CANDIDATES, new Set([1, 2, 99]))).toEqual(["alpha"]);
+    expect(selectedRefs(CANDIDATES, new Set([1, 2, 99]), NONE)).toEqual(["alpha"]);
+  });
+
+  it("уже добавленный повторно не отдаёт", () => {
+    expect(selectedRefs(CANDIDATES, new Set([1, 3]), existingSet(["alpha"]))).toEqual([
+      "beta",
+    ]);
   });
 
   it("пустой выбор — пустой список", () => {
-    expect(selectedRefs(CANDIDATES, new Set())).toEqual([]);
+    expect(selectedRefs(CANDIDATES, new Set(), NONE)).toEqual([]);
   });
 });
 
-describe("withoutExisting", () => {
-  it("прячет уже добавленные, регистр не важен", () => {
-    const left = withoutExisting(CANDIDATES, ["ALPHA"]);
-    expect(left.map((c) => c.tg_id)).toEqual([2, 99]);
+describe("countAddable", () => {
+  it("считает то, что реально можно добавить", () => {
+    expect(countAddable(CANDIDATES, NONE)).toBe(2);
+    expect(countAddable(CANDIDATES, existingSet(["alpha", "beta"]))).toBe(0);
+    expect(countAddable([], NONE)).toBe(0);
   });
 });

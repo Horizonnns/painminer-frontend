@@ -10,9 +10,25 @@ export function isAddable(candidate: Candidate): boolean {
   return Boolean(candidate.username) && candidate.kind === "group";
 }
 
-/** По умолчанию отмечены группы с username — каналы нам не нужны. */
-export function defaultSelection(candidates: readonly Candidate[]): Set<number> {
-  return new Set(candidates.filter(isAddable).map((item) => item.tg_id));
+export function existingSet(existing: readonly string[]): Set<string> {
+  return new Set(existing.map((ref) => ref.toLowerCase()));
+}
+
+/** Уже записан в YAML ниши. Такие показываем, но пометкой, а не молчком. */
+export function isAdded(candidate: Candidate, existing: ReadonlySet<string>): boolean {
+  return Boolean(candidate.username) && existing.has(candidate.username!.toLowerCase());
+}
+
+/** По умолчанию отмечены группы с username, которых ещё нет в нише. */
+export function defaultSelection(
+  candidates: readonly Candidate[],
+  existing: ReadonlySet<string>,
+): Set<number> {
+  return new Set(
+    candidates
+      .filter((item) => isAddable(item) && !isAdded(item, existing))
+      .map((item) => item.tg_id),
+  );
 }
 
 export function toggle(selected: ReadonlySet<number>, tgId: number): Set<number> {
@@ -22,23 +38,24 @@ export function toggle(selected: ReadonlySet<number>, tgId: number): Set<number>
   return next;
 }
 
-/** Ссылки для записи в YAML — только у отмеченных и только username. */
+/** Ссылки для записи в YAML — только отмеченные, пригодные и ещё не добавленные. */
 export function selectedRefs(
   candidates: readonly Candidate[],
   selected: ReadonlySet<number>,
+  existing: ReadonlySet<string>,
 ): string[] {
   return candidates
-    .filter((item) => selected.has(item.tg_id) && isAddable(item))
+    .filter(
+      (item) =>
+        selected.has(item.tg_id) && isAddable(item) && !isAdded(item, existing),
+    )
     .map((item) => item.username as string);
 }
 
-/** Уже добавленные в нишу отмечать повторно незачем. */
-export function withoutExisting(
+/** Сколько из найденного вообще можно добавить — от этого зависит текст пустого экрана. */
+export function countAddable(
   candidates: readonly Candidate[],
-  existing: readonly string[],
-): Candidate[] {
-  const taken = new Set(existing.map((ref) => ref.toLowerCase()));
-  return candidates.filter(
-    (item) => !item.username || !taken.has(item.username.toLowerCase()),
-  );
+  existing: ReadonlySet<string>,
+): number {
+  return candidates.filter((item) => isAddable(item) && !isAdded(item, existing)).length;
 }

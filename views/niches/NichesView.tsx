@@ -72,7 +72,9 @@ export function NichesView() {
           <p className="mt-1 text-sm text-muted">{MESSAGES.niches.subtitle}</p>
           <p className="mt-2 max-w-2xl text-xs text-faint">{MESSAGES.niches.explain}</p>
         </div>
-        {!creating ? (
+        {/* Пока ниш нет, звать создавать должна одна кнопка — та, что в пустом
+            состоянии. Дублировать её в шапке незачем. */}
+        {!creating && data && data.length > 0 ? (
           <Button size="sm" icon={<Plus size={14} />} onClick={() => setCreating(true)}>
             {MESSAGES.niches.create}
           </Button>

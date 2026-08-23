@@ -6,11 +6,13 @@ import { useMemo, useState } from "react";
 
 import { useAddChats, useDiscover } from "@/entities/chat/api/queries";
 import {
+  countAddable,
   defaultSelection,
+  existingSet,
+  isAdded,
   isAddable,
   selectedRefs,
   toggle,
-  withoutExisting,
 } from "@/features/discover-chats/model/selection";
 import { ApiError } from "@/shared/api/client";
 import { ROUTES } from "@/shared/config/constants";
@@ -27,13 +29,15 @@ import type { Candidate } from "@/shared/api/types";
 function CandidateRow({
   candidate,
   checked,
+  added,
   onToggle,
 }: {
   candidate: Candidate;
   checked: boolean;
+  added: boolean;
   onToggle: () => void;
 }) {
-  const addable = isAddable(candidate);
+  const addable = isAddable(candidate) && !added;
 
   return (
     <li className="flex items-center gap-3 border-b border-divider px-4 py-2.5 last:border-b-0">
@@ -54,6 +58,7 @@ function CandidateRow({
       <span className="font-mono text-xs text-muted tabular-nums">
         {formatMembers(candidate.members)}
       </span>
+      {added ? <Badge tone="ok">{MESSAGES.discover.alreadyInNiche}</Badge> : null}
       <Badge tone={candidate.kind === "group" ? "neutral" : "bad"}>
         {candidate.kind === "group" ? MESSAGES.discover.group : MESSAGES.discover.channel}
       </Badge>
@@ -75,10 +80,10 @@ export function DiscoverPanel({
   const discover = useDiscover(niche, submitted);
   const add = useAddChats(niche);
 
-  const candidates = useMemo(
-    () => withoutExisting(discover.data ?? [], existing),
-    [discover.data, existing],
-  );
+  const candidates = discover.data ?? [];
+  // Уже добавленные не прячем: иначе повторный поиск выглядит как «ничего нет».
+  const taken = useMemo(() => existingSet(existing), [existing]);
+  const addable = countAddable(candidates, taken);
 
   const search = () => {
     setSubmitted(keyword.trim());
@@ -86,8 +91,8 @@ export function DiscoverPanel({
   };
 
   // Первый показ результатов сам отмечает пригодные группы.
-  const marks = selected.size > 0 ? selected : defaultSelection(candidates);
-  const refs = selectedRefs(candidates, marks);
+  const marks = selected.size > 0 ? selected : defaultSelection(candidates, taken);
+  const refs = selectedRefs(candidates, marks, taken);
 
   return (
     <Card>
@@ -157,6 +162,15 @@ export function DiscoverPanel({
         </div>
       ) : null}
 
+      {candidates.length > 0 && addable === 0 && !discover.isFetching ? (
+        <div className="border-b border-divider p-4">
+          <StateBlock
+            title={MESSAGES.discover.allAdded}
+            hint={MESSAGES.discover.allAddedHint}
+          />
+        </div>
+      ) : null}
+
       {candidates.length > 0 ? (
         <>
           <ul>
@@ -164,6 +178,7 @@ export function DiscoverPanel({
               <CandidateRow
                 key={candidate.tg_id}
                 candidate={candidate}
+                added={isAdded(candidate, taken)}
                 checked={marks.has(candidate.tg_id)}
                 onToggle={() => setSelected(toggle(marks, candidate.tg_id))}
               />
