@@ -7,7 +7,7 @@ import { VerdictChip } from "@/entities/finding/ui/VerdictChip";
 import { Badge } from "@/shared/ui/Badge";
 import { MESSAGES } from "@/shared/config/messages";
 import { cn } from "@/shared/lib/cn";
-import { formatRelative, truncate } from "@/shared/lib/format";
+import { formatRelative, plural, truncate } from "@/shared/lib/format";
 import type { Finding } from "@/shared/api/types";
 
 interface FindingRowProps {
@@ -61,6 +61,13 @@ export function FindingRow({
           <span className="font-mono tabular-nums">
             {finding.replies} / {finding.reactions}
           </span>
+          {finding.repeats > 1 ? (
+            <span title={MESSAGES.finding.repeatsTitle}>
+              <Badge tone="bad">
+                ×{finding.repeats} {plural(finding.repeats, MESSAGES.finding.repeatForms)}
+              </Badge>
+            </span>
+          ) : null}
           {finding.has_money ? <Badge tone="accent">{MESSAGES.finding.money}</Badge> : null}
           {finding.cluster ? <Badge>{finding.cluster}</Badge> : null}
           {finding.verdict ? <VerdictChip verdict={finding.verdict} /> : null}

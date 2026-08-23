@@ -65,6 +65,10 @@ export interface Finding {
   score: number;
   has_money: boolean;
   is_question: boolean;
+  /** Сколько раз этот текст встретился дословно. 1 — обычная находка. */
+  repeats: number;
+  first_seen: string | null;
+  last_seen: string | null;
 }
 
 export interface FacetItem {
@@ -95,6 +99,7 @@ export interface FindingsQuery {
   money?: boolean;
   question?: boolean;
   search?: string;
+  hide_repeated?: boolean;
   sort?: string;
   limit?: number;
   offset?: number;

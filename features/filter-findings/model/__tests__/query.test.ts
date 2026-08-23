@@ -21,6 +21,7 @@ describe("parseFilters", () => {
       money: undefined,
       question: undefined,
       search: undefined,
+      hideRepeated: undefined,
       sort: DEFAULT_SORT,
     });
   });
@@ -75,5 +76,23 @@ describe("countActive", () => {
     expect(countActive(EMPTY_FILTERS)).toBe(0);
     expect(countActive({ sort: "date" })).toBe(0);
     expect(countActive({ sort: "score", money: false, chat: 2 })).toBe(2);
+  });
+});
+
+describe("частые повторы", () => {
+  it("читаются и пишутся в URL", () => {
+    expect(parse("repeats=hide").hideRepeated).toBe(true);
+    expect(parse("").hideRepeated).toBeUndefined();
+    expect(filtersToSearch({ sort: DEFAULT_SORT, hideRepeated: true })).toBe("repeats=hide");
+    expect(filtersToSearch({ sort: DEFAULT_SORT })).toBe("");
+  });
+
+  it("уходят в запрос к API только когда включены", () => {
+    expect(toApiQuery({ sort: "score", hideRepeated: true }).hide_repeated).toBe(true);
+    expect(toApiQuery({ sort: "score" }).hide_repeated).toBeUndefined();
+  });
+
+  it("считаются активным условием", () => {
+    expect(countActive({ sort: "score", hideRepeated: true })).toBe(1);
   });
 });

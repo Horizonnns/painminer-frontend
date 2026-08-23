@@ -8,6 +8,7 @@ import { MESSAGES } from "@/shared/config/messages";
 import { SORTS, VERDICTS } from "@/shared/config/constants";
 import { Input } from "@/shared/ui/Input";
 import { Select } from "@/shared/ui/Select";
+import { Switch } from "@/shared/ui/Switch";
 import { Toggle } from "@/shared/ui/Toggle";
 import { cn } from "@/shared/lib/cn";
 import type { Facets } from "@/shared/api/types";
@@ -78,6 +79,17 @@ export function FiltersPanel({ filters, facets, onUpdate, onReset }: FiltersPane
           value={filters.question}
           onChange={(question) => onUpdate({ question })}
         />
+        <Switch
+          label={MESSAGES.filters.repeated}
+          state={
+            filters.hideRepeated
+              ? MESSAGES.filters.repeatedHidden
+              : MESSAGES.filters.repeatedShown
+          }
+          on={Boolean(filters.hideRepeated)}
+          onChange={(hide) => onUpdate({ hideRepeated: hide || undefined })}
+        />
+        <p className="px-0.5 text-xs text-faint">{MESSAGES.filters.repeatedHint}</p>
       </div>
 
       <section>

@@ -27,6 +27,9 @@ function finding(message_id: number, score = 1): Finding {
     score,
     has_money: false,
     is_question: false,
+    repeats: 1,
+    first_seen: null,
+    last_seen: null,
   };
 }
 
