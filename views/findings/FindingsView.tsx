@@ -92,7 +92,7 @@ export function FindingsView({ niche }: { niche: string }) {
         ) : null}
       </div>
 
-      <Card className="flex max-h-[calc(100vh-14rem)] flex-col lg:sticky lg:top-16">
+      <Card className="flex max-h-[calc(100vh-14rem)] flex-col lg:sticky lg:top-36">
         <CardHeader title={MESSAGES.note.title} />
         {selected ? (
           <NotePanel

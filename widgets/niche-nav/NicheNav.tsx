@@ -23,8 +23,11 @@ export function NicheNav({ niche }: { niche: string }) {
   const pathname = usePathname();
 
   return (
-    <div className="mb-6 border-b border-divider">
-      <div className="flex items-baseline gap-4 pb-3">
+    // Липнет под общей шапкой: имя ниши и вкладки нужны на любой прокрутке.
+    // Отрицательные поля растягивают фон на всю ширину колонки контента,
+    // иначе он просвечивал бы по краям.
+    <div className="sticky top-12 z-10 -mx-6 mb-6 border-b border-divider bg-bg/90 px-6 backdrop-blur">
+      <div className="flex items-baseline gap-4 pt-3 pb-3">
         <h1 className="font-mono text-lg text-text">{niche}</h1>
       </div>
       <nav className="flex gap-1">
