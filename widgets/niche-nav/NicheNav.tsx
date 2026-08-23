@@ -9,7 +9,10 @@ import { cn } from "@/shared/lib/cn";
 
 /** Вкладки добавляются по мере появления экранов — на несуществующие не ведём. */
 function tabs(niche: string) {
-  return [{ href: ROUTES.niche(niche), label: MESSAGES.nav.dashboard }];
+  return [
+    { href: ROUTES.niche(niche), label: MESSAGES.nav.dashboard },
+    { href: ROUTES.findings(niche), label: MESSAGES.nav.findings },
+  ];
 }
 
 export function NicheNav({ niche }: { niche: string }) {
