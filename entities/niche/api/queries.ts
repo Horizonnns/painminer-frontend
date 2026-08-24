@@ -8,6 +8,7 @@ import type {
   NicheConfig,
   NicheConfigPatch,
   NicheSummary,
+  NicheDeleted,
   Report,
 } from "@/shared/api/types";
 
@@ -57,6 +58,15 @@ export function useUpdateNicheConfig(niche: string) {
       client.setQueryData(nicheKeys.config(niche), config);
       void client.invalidateQueries({ queryKey: nicheKeys.all });
     },
+  });
+}
+
+export function useDeleteNiche() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (niche: string) =>
+      apiSend<NicheDeleted>("DELETE", `/niches/${niche}`),
+    onSuccess: () => client.invalidateQueries({ queryKey: nicheKeys.all }),
   });
 }
 

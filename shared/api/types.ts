@@ -208,3 +208,9 @@ export interface AuthStatus {
   user: string | null;
   phone: string | null;
 }
+
+export interface NicheDeleted {
+  niche: string;
+  chats: number;
+  findings: number;
+}
