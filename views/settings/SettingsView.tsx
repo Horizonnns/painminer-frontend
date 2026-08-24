@@ -150,7 +150,7 @@ function DangerZone({ niche }: { niche: string }) {
               {MESSAGES.settings.deleteYes}
             </Button>
             <Button variant="ghost" size="sm" onClick={() => setAsking(false)}>
-              {MESSAGES.settings.deleteNo}
+              {MESSAGES.settings.deleteCancel}
             </Button>
           </>
         ) : (
@@ -171,6 +171,7 @@ function DangerZone({ niche }: { niche: string }) {
           </span>
         ) : null}
       </div>
+      <p className="px-4 pb-4 text-xs text-faint">{MESSAGES.settings.dangerNote}</p>
     </Card>
   );
 }
