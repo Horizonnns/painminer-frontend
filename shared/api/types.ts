@@ -1,6 +1,8 @@
 /** Зеркало painminer/api/schemas.py. Инлайновых типов в компонентах нет. */
 
 export type Verdict = "yes" | "no" | "maybe";
+/** complaint — у человека болит, offer — человек продаёт услугу. */
+export type Kind = "complaint" | "offer" | "unclear";
 export type AuthStage = "phone" | "code" | "password" | "done" | "unknown";
 export type RunStatus = "running" | "done" | "failed" | "stopped";
 export type ChatStatus =
@@ -69,6 +71,7 @@ export interface Finding {
   repeats: number;
   first_seen: string | null;
   last_seen: string | null;
+  kind: Kind;
 }
 
 export interface FacetItem {
@@ -99,6 +102,7 @@ export interface FindingsQuery {
   money?: boolean;
   question?: boolean;
   search?: string;
+  kind?: string;
   hide_repeated?: boolean;
   sort?: string;
   limit?: number;
@@ -133,6 +137,15 @@ export interface NicheSummary {
   last_scanned_at: string | null;
 }
 
+export interface QueryStat {
+  query: string;
+  findings: number;
+  marked: number;
+  good: number;
+  /** null — по фразе ещё нет ни одного вердикта. */
+  accuracy: number | null;
+}
+
 export interface Ngram {
   gram: string;
   count: number;
@@ -146,6 +159,8 @@ export interface Report {
   bigrams: Ngram[];
   trigrams: Ngram[];
   money: Finding[];
+  queries: QueryStat[];
+  offers: Finding[];
 }
 
 export interface Candidate {

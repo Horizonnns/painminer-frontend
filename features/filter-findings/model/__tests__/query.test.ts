@@ -21,6 +21,7 @@ describe("parseFilters", () => {
       money: undefined,
       question: undefined,
       search: undefined,
+      kind: undefined,
       hideRepeated: undefined,
       sort: DEFAULT_SORT,
     });
@@ -94,5 +95,17 @@ describe("частые повторы", () => {
 
   it("считаются активным условием", () => {
     expect(countActive({ sort: "score", hideRepeated: true })).toBe(1);
+  });
+});
+
+describe("тип сообщения", () => {
+  it("живёт в URL как остальные фильтры", () => {
+    expect(parse("kind=offer").kind).toBe("offer");
+    expect(filtersToSearch({ sort: DEFAULT_SORT, kind: "complaint" })).toBe("kind=complaint");
+  });
+
+  it("уходит в запрос и считается активным условием", () => {
+    expect(toApiQuery({ sort: "score", kind: "offer" }).kind).toBe("offer");
+    expect(countActive({ sort: "score", kind: "offer" })).toBe(1);
   });
 });

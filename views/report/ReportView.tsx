@@ -4,6 +4,7 @@ import { useNicheReport } from "@/entities/niche/api/queries";
 import { ChatsTable } from "@/widgets/chats-table/ChatsTable";
 import { FindingsCard } from "@/widgets/findings-card/FindingsCard";
 import { NgramPanel } from "@/widgets/ngram-panel/NgramPanel";
+import { QueryStats } from "@/widgets/query-stats/QueryStats";
 import { ApiError } from "@/shared/api/client";
 import { MESSAGES } from "@/shared/config/messages";
 import { SkeletonList } from "@/shared/ui/Skeleton";
@@ -41,6 +42,15 @@ export function ReportView({ niche }: { niche: string }) {
           />
         </div>
       </section>
+
+      <FindingsCard
+        title={MESSAGES.report.offers}
+        hint={MESSAGES.report.offersHint}
+        findings={data.offers}
+        emptyTitle={MESSAGES.report.noOffers}
+      />
+
+      <QueryStats stats={data.queries} />
 
       <FindingsCard
         title={MESSAGES.report.money}

@@ -11,6 +11,8 @@ export interface FindingsFilters {
   money?: boolean;
   question?: boolean;
   search?: string;
+  /** complaint или offer: боль или предложение услуг. */
+  kind?: string;
   /** Скрывать тексты, опубликованные много раз подряд, — обычно это реклама. */
   hideRepeated?: boolean;
   sort: string;
@@ -39,6 +41,7 @@ export function parseFilters(params: URLSearchParams): FindingsFilters {
     money: parseBool(params.get("money")),
     question: parseBool(params.get("question")),
     search: params.get("search") || undefined,
+    kind: params.get("kind") || undefined,
     hideRepeated: params.get("repeats") === "hide" ? true : undefined,
     sort: sort && (SORTS as readonly string[]).includes(sort) ? sort : DEFAULT_SORT,
   };
@@ -54,6 +57,7 @@ export function filtersToSearch(filters: FindingsFilters): string {
   if (filters.money !== undefined) params.set("money", String(filters.money));
   if (filters.question !== undefined) params.set("question", String(filters.question));
   if (filters.search) params.set("search", filters.search);
+  if (filters.kind) params.set("kind", filters.kind);
   if (filters.hideRepeated) params.set("repeats", "hide");
   if (filters.sort !== DEFAULT_SORT) params.set("sort", filters.sort);
   return params.toString();
@@ -72,6 +76,7 @@ export function toApiQuery(
     money: filters.money,
     question: filters.question,
     search: filters.search,
+    kind: filters.kind,
     hide_repeated: filters.hideRepeated || undefined,
     sort: filters.sort,
     limit,
@@ -89,6 +94,7 @@ export function countActive(filters: FindingsFilters): number {
     filters.money,
     filters.question,
     filters.search,
+    filters.kind,
     filters.hideRepeated,
   ];
   return values.filter((value) => value !== undefined && value !== "").length;

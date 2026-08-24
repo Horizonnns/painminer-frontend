@@ -93,6 +93,33 @@ export function FiltersPanel({ filters, facets, onUpdate, onReset }: FiltersPane
       </div>
 
       <section>
+        <h3 className="mb-1.5 text-xs text-muted">{MESSAGES.filters.kind}</h3>
+        <div className="flex flex-wrap gap-1">
+          {[
+            { value: undefined, label: MESSAGES.filters.kindAny },
+            { value: "complaint", label: MESSAGES.filters.kindComplaint },
+            { value: "offer", label: MESSAGES.filters.kindOffer },
+          ].map((option) => (
+            <button
+              key={option.label}
+              type="button"
+              onClick={() => onUpdate({ kind: option.value })}
+              aria-pressed={filters.kind === option.value}
+              className={cn(
+                "rounded-md border px-2 py-1 text-xs transition-colors",
+                filters.kind === option.value
+                  ? "border-accent/40 bg-accent/10 text-accent"
+                  : "border-border text-muted hover:border-faint hover:text-text",
+              )}
+            >
+              {option.label}
+            </button>
+          ))}
+        </div>
+        <p className="mt-1.5 text-xs text-faint">{MESSAGES.filters.kindHint}</p>
+      </section>
+
+      <section>
         <h3 className="mb-1.5 text-xs text-muted">{MESSAGES.filters.verdict}</h3>
         <div className="flex flex-wrap gap-1">
           {[undefined, ...VERDICTS, "none"].map((verdict) => {

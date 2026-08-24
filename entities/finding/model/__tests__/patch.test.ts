@@ -30,6 +30,7 @@ function finding(message_id: number, score = 1): Finding {
     repeats: 1,
     first_seen: null,
     last_seen: null,
+    kind: "unclear",
   };
 }
 

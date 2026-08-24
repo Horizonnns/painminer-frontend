@@ -61,6 +61,11 @@ export function FindingRow({
           <span className="font-mono tabular-nums">
             {finding.replies} / {finding.reactions}
           </span>
+          {finding.kind === "offer" ? (
+            <span title={MESSAGES.finding.offerTitle}>
+              <Badge tone="bad">{MESSAGES.finding.offer}</Badge>
+            </span>
+          ) : null}
           {finding.repeats > 1 ? (
             <span title={MESSAGES.finding.repeatsTitle}>
               <Badge tone="bad">
