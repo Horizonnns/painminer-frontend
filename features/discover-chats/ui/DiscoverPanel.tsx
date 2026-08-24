@@ -7,6 +7,7 @@ import { useMemo, useState } from "react";
 import { useAddChats, useDiscover } from "@/entities/chat/api/queries";
 import {
   countAddable,
+  countAdded,
   defaultSelection,
   existingSet,
   isAdded,
@@ -84,6 +85,7 @@ export function DiscoverPanel({
   // Уже добавленные не прячем: иначе повторный поиск выглядит как «ничего нет».
   const taken = useMemo(() => existingSet(existing), [existing]);
   const addable = countAddable(candidates, taken);
+  const added = countAdded(candidates, taken);
 
   const search = () => {
     setSubmitted(keyword.trim());
@@ -162,11 +164,17 @@ export function DiscoverPanel({
         </div>
       ) : null}
 
+      {/* Добавить нечего по двум разным причинам, и путать их нельзя:
+          либо всё найденное уже в нише, либо ничего пригодного не нашлось. */}
       {candidates.length > 0 && addable === 0 && !discover.isFetching ? (
         <div className="border-b border-divider p-4">
           <StateBlock
-            title={MESSAGES.discover.allAdded}
-            hint={MESSAGES.discover.allAddedHint}
+            title={added > 0 ? MESSAGES.discover.allAdded : MESSAGES.discover.nothingToAdd}
+            hint={
+              added > 0
+                ? MESSAGES.discover.allAddedHint
+                : MESSAGES.discover.nothingToAddHint
+            }
           />
         </div>
       ) : null}

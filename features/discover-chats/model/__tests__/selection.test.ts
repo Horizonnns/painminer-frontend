@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   countAddable,
+  countAdded,
   defaultSelection,
   existingSet,
   isAdded,
@@ -94,5 +95,17 @@ describe("countAddable", () => {
     expect(countAddable(CANDIDATES, NONE)).toBe(2);
     expect(countAddable(CANDIDATES, existingSet(["alpha", "beta"]))).toBe(0);
     expect(countAddable([], NONE)).toBe(0);
+  });
+});
+
+describe("countAdded", () => {
+  it("считает только уже добавленные", () => {
+    expect(countAdded(CANDIDATES, existingSet(["alpha"]))).toBe(1);
+    expect(countAdded(CANDIDATES, NONE)).toBe(0);
+  });
+
+  it("каналы и чаты без username в «уже добавленных» не числятся", () => {
+    // Ни один из них добавить было нельзя, значит и добавленными они не стали.
+    expect(countAdded([group(2, null), channel], existingSet(["news"]))).toBe(1);
   });
 });

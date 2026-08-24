@@ -59,3 +59,11 @@ export function countAddable(
 ): number {
   return candidates.filter((item) => isAddable(item) && !isAdded(item, existing)).length;
 }
+
+/** Сколько из найденного уже записано в нишу. */
+export function countAdded(
+  candidates: readonly Candidate[],
+  existing: ReadonlySet<string>,
+): number {
+  return candidates.filter((item) => isAdded(item, existing)).length;
+}
